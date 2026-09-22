@@ -1,0 +1,64 @@
+services:
+  lb:
+    build: .
+    ports:
+      - "9000:9000"
+      - "6060:6060"
+
+    environment:
+      APP_ENV: "prod"
+      HTTP_PORT: 9000
+      ALGORITHM: "p2c" # weighted_random, least_connections, weighted_least_connections, p2c
+      NODES_FILE_PATH: "./nodes.json"
+      HEALTH_CHECKER_TIMEOUT: 1
+      HEALTH_CHECKER_INTERVAL: 1
+      SERVER_READ_HEADER_TIMEOUT: 5
+      SERVER_READ_TIMEOUT: 30
+      SERVER_WRITE_TIMEOUT: 60
+      SERVER_IDLE_TIMEOUT: 120
+      MAX_HEADER_BYTES: 1048576 # 1 MB
+    depends_on:
+      - backend-1
+      - backend-2
+      - backend-3
+    networks:
+      - lb_net
+
+  backend-1:
+    build: .
+    command: ["./backend", "8000"]
+    ports:
+      - "8000:8000"
+    networks:
+      - lb_net
+
+  backend-2:
+    build: .
+    command: ["./backend", "8001"]
+    networks:
+      - lb_net
+
+  backend-3:
+    build: .
+    command: ["./backend", "8002"]
+    networks:
+      - lb_net
+
+  backend-4:
+    build: .
+    command: ["./backend", "8003"]
+    networks:
+      - lb_net
+
+  backend-5:
+    build: .
+    command: ["./backend", "8004"]
+    networks:
+      - lb_net
+
+networks:
+  lb_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.150.0.0/24

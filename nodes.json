@@ -1,0 +1,24 @@
+{
+  "nodes": [
+    {
+      "ip": "backend-1:8000",
+      "weight": 10
+    },
+    {
+      "ip": "backend-2:8001",
+      "weight": 100
+    },
+    {
+      "ip": "backend-3:8002",
+      "weight": 100
+    },
+    {
+      "ip": "backend-4:8003",
+      "weight": 100
+    },
+    {
+      "ip": "backend-5:8004",
+      "weight": 100
+    }
+  ]
+}
