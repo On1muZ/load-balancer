@@ -21,17 +21,17 @@ func (wr *WeightedRandom) Next() (*backend.Backend, error) {
 	}
 	totalWeight := 0
 	for _, node := range nodes {
-		totalWeight += node.Weight
+		totalWeight += int(node.Weight.Load())
 	}
 	if totalWeight <= 0 {
 		return nodes[rand.IntN(len(nodes))], nil
 	}
 	target := rand.IntN(totalWeight)
 	for _, node := range nodes {
-		if target < node.Weight {
+		if target < int(node.Weight.Load()) {
 			return node, nil
 		}
-		target -= node.Weight
+		target -= int(node.Weight.Load())
 	}
 	return nodes[0], nil
 }

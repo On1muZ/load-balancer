@@ -15,10 +15,6 @@
     {
       "ip": "backend-4:8003",
       "weight": 100
-    },
-    {
-      "ip": "backend-5:8004",
-      "weight": 100
     }
   ]
 }

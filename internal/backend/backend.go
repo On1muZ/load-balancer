@@ -9,7 +9,7 @@ import (
 
 type Backend struct {
 	URL        *url.URL
-	Weight     int
+	Weight     atomic.Int32
 	Alive      atomic.Bool
 	AliveConns atomic.Int64
 	Metrics    *metrics.Metrics
@@ -22,9 +22,9 @@ func NewBackend(URL string, Weight int) (*Backend, error) {
 	}
 	b := &Backend{
 		URL:     u,
-		Weight:  Weight,
 		Metrics: &metrics.Metrics{StartTimestamp: time.Now().Unix()},
 	}
+	b.Weight.Store(int32(Weight))
 	b.Alive.Store(true)
 	return b, nil
 }

@@ -18,10 +18,10 @@ func (wll *WeightedLeastConnections) Next() (*backend.Backend, error) {
 	if len(nodes) == 0 {
 		return nil, fmt.Errorf("no alive nodes")
 	}
-	minLoad := float64(nodes[0].AliveConns.Load()) / float64((nodes[0].Weight))
+	minLoad := float64(nodes[0].AliveConns.Load()) / float64((nodes[0].Weight.Load()))
 	target := nodes[0]
 	for _, node := range nodes[1:] {
-		currentLoad := float64(node.AliveConns.Load()) / float64((node.Weight))
+		currentLoad := float64(node.AliveConns.Load()) / float64((node.Weight.Load()))
 		if minLoad > currentLoad {
 			target = node
 			minLoad = currentLoad
@@ -29,4 +29,3 @@ func (wll *WeightedLeastConnections) Next() (*backend.Backend, error) {
 	}
 	return target, nil
 }
-

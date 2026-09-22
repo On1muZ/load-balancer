@@ -5,11 +5,15 @@ services:
       - "9000:9000"
       - "6060:6060"
 
+    # монтируем директорию, а не файл: при сохранении через rename bind-mount файла остаётся на старом inode
+    volumes:
+      - ./config:/app/config:z
+
     environment:
       APP_ENV: "prod"
       HTTP_PORT: 9000
       ALGORITHM: "p2c" # weighted_random, least_connections, weighted_least_connections, p2c
-      NODES_FILE_PATH: "./nodes.json"
+      NODES_FILE_PATH: "./config/nodes.json"
       HEALTH_CHECKER_TIMEOUT: 1
       HEALTH_CHECKER_INTERVAL: 1
       SERVER_READ_HEADER_TIMEOUT: 5

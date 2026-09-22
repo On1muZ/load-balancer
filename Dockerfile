@@ -10,7 +10,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/backend ./test/backend.go
 FROM alpine:3.20
 
 WORKDIR /app
-COPY nodes.json .
+COPY config/nodes.json ./config/
 COPY --from=builder /app/bin/app .
 COPY --from=builder /app/bin/backend .
 EXPOSE 9000

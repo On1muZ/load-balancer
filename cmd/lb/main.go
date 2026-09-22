@@ -10,6 +10,7 @@ import (
 	"lb/internal/logger"
 	"lb/internal/proxy"
 	"lb/internal/transport"
+	"lb/internal/watcher"
 	"log/slog"
 	"net/http"
 	"os"
@@ -50,6 +51,14 @@ func main() {
 	go checker.Start(ctx)
 	log.Info("health checker started", slog.Duration("interval", cfg.HealthChecker.Interval), slog.Duration("timeout", cfg.HealthChecker.Timeout))
 
+	nodesWatcher := watcher.NewNodesWatcher(cfg.NodesFilePath, pool, log)
+	go func() {
+		if err := nodesWatcher.Start(ctx); err != nil {
+			log.Error("nodes watcher failed", "error", err)
+		}
+	}()
+	log.Info("nodes watcher started", slog.String("path", cfg.NodesFilePath))
+
 	transport := transport.NewTransport()
 	proxy := proxy.NewProxy(transport)
 	lb := balancer.NewBalancer(algo, proxy, log)
@@ -75,7 +84,7 @@ func main() {
 	<-ctx.Done()
 	log.Info("shutting down gracefully...")
 
-	for _, b := range backends {
+	for _, b := range pool.All() {
 		uptime := b.Metrics.Uptime()
 		log.Info("backend metrics", slog.String("url", b.URL.String()), slog.Int64("total_requests", b.Metrics.TotalRequests.Load()), slog.Float64("uptime", uptime.AliveTime.Seconds()), slog.Float64("uptime_persentage", uptime.AlivePercentage))
 	}

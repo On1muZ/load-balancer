@@ -55,3 +55,30 @@ func (p *Pool) RebuildAlive() {
 	}
 	p.alive.Store(&alive)
 }
+
+func (p *Pool) Update(fresh []*Backend) (added, removed int) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	old := make(map[string]*Backend, len(p.backends))
+	for _, b := range p.backends {
+		old[b.URL.String()] = b
+	}
+
+	next := make([]*Backend, 0, len(fresh))
+	for _, nb := range fresh {
+		key := nb.URL.String()
+		if ob, ok := old[key]; ok {
+			delete(old, key)
+			ob.Weight.Store(nb.Weight.Load())
+			next = append(next, ob)
+			continue
+		}
+		added++
+		next = append(next, nb)
+	}
+	removed = len(old)
+	p.backends = next
+	p.RebuildAlive()
+	return added, removed
+}

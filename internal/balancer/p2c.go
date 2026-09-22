@@ -27,7 +27,7 @@ func (p2c *P2C) Next() (*backend.Backend, error) {
 		j = rand.IntN(len(nodes))
 	}
 	var target *backend.Backend
-	if nodes[i].AliveConns.Load()*int64(nodes[j].Weight) > nodes[j].AliveConns.Load()*int64(nodes[i].Weight) {
+	if nodes[i].AliveConns.Load()*int64(nodes[j].Weight.Load()) > nodes[j].AliveConns.Load()*int64(nodes[i].Weight.Load()) {
 		target = nodes[j]
 	} else {
 		target = nodes[i]
